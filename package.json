@@ -1,0 +1,19 @@
+{
+  "name": "x402-cli",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@solana/kit": "^2.1.1",
+    "@solana/signers": "^2.1.1",
+    "axios": "^1.13.2",
+    "commander": "^14.0.2",
+    "x402-axios": "^0.7.0",
+    "x402-fetch": "^0.7.0"
+  }
+}
