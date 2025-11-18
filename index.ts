@@ -1,11 +1,9 @@
 import { Command } from "commander";
-import axios from "axios";
-import { wrapFetchWithPayment } from "x402-fetch";
-import { withPaymentInterceptor, type Signer } from "x402-axios";
-import { createKeyPairSignerFromBytes } from "@solana/kit";
-import fs from "fs";
-import os from "os";
-import path from "path";
+import { buildUrlWithQueryParams } from "./src/utils/url";
+import { loadKeypair } from "./src/utils/keypair";
+import { makeDryRunRequest, makePaymentRequest } from "./src/utils/requests";
+import { fetchPaymentRequirements, resolveNetwork } from "./src/utils/payment";
+import { displayPaymentRequirements } from "./src/utils/display";
 
 const program = new Command();
 
@@ -18,38 +16,62 @@ program
   .command("GET")
   .description("Sends a Get Request")
   .argument("<url>", "url to send the request to")
-  .action(async (url) => {
-    const keypairPath = path.join(os.homedir(), ".config", "solana", "id.json");
-    const keypairFile = fs.readFileSync(keypairPath);
-    const keypairBytes = new Uint8Array(JSON.parse(keypairFile.toString()));
-
-    const signer = (await createKeyPairSignerFromBytes(keypairBytes)) as Signer;
-    const protectedFetch = wrapFetchWithPayment(fetch, signer);
-    const params = new URLSearchParams({
-      inputMint: "So11111111111111111111111111111111111111112", // SOL
-      outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", // USDC
-      amount: "1000000000", // 1 SOL (9 decimals)
-    });
-    const response = await protectedFetch(
-      `https://dflow.api.corbits.dev/quote?${params}`,
-      {
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-        },
+  .option("--keypair <path>", "Path to Solana keypair file")
+  .option("--dry-run", "Dry run the request and get the payment payload")
+  .option("--network <network>", "Network to use")
+  .option(
+    "--query <key=value>",
+    "Query parameter (can be used multiple times)",
+    (val, prev: Record<string, string> = {}) => {
+      const [key, ...valueParts] = val.split("=");
+      if (!key) {
+        throw new Error(
+          `Invalid query parameter format: ${val}. Use --query key=value`
+        );
       }
-    );
+      const value = valueParts.join("="); // Handle values that contain '='
+      prev[key] = value;
+      return prev;
+    }
+  )
+  .action(async (url, options) => {
+    try {
+      const finalUrl = buildUrlWithQueryParams(url, options.query);
 
-    console.log("response", response);
-    // const api = withPaymentInterceptor(
-    //   axios.create({
-    //     baseURL: "https://dflow.api.corbits.dev",
-    //   }),
-    //   signer
-    // );
+      if (options.dryRun) {
+        await makeDryRunRequest(finalUrl);
+        return;
+      }
 
-    // api.get(`/quote?${params}`).then((response) => {
-    //   console.log(response.data);
-    // });
+      // Payment mode - requires keypair
+      if (!options.keypair) {
+        console.error("Error: --keypair is required when not using --dry-run");
+        process.exit(1);
+      }
+
+      const keypair = loadKeypair(options.keypair);
+      console.log("Wallet:", keypair.publicKey.toString());
+
+      const { requirements, solanaOption } = await fetchPaymentRequirements(
+        finalUrl
+      );
+
+      // If no payment required (200 response), requirements will be null
+      if (!requirements || !solanaOption) {
+        return;
+      }
+
+      const network = resolveNetwork(solanaOption.network, options.network);
+      console.log("Network:", network);
+      console.log("Asset:", solanaOption.asset);
+
+      await makePaymentRequest(finalUrl, keypair, network, solanaOption.asset);
+    } catch (error) {
+      console.error(
+        "Error:",
+        error instanceof Error ? error.message : String(error)
+      );
+      process.exit(1);
+    }
   });
 program.parse();
