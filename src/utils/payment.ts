@@ -1,5 +1,6 @@
 import { x402PaymentRequiredResponse } from "@faremeter/types/x402";
 import axios, { AxiosError } from "axios";
+import { DEFAULT_HEADERS } from "./requests";
 
 const NETWORK_MAP: Record<string, string> = {
   "solana-mainnet-beta": "mainnet-beta",
@@ -21,14 +22,24 @@ export interface PaymentRequirementsResult {
 }
 
 export async function fetchPaymentRequirements(
-  url: string
+  url: string,
+  method: "GET" | "POST" = "GET",
+  data?: any
 ): Promise<PaymentRequirementsResult> {
   try {
-    const response = await axios.get(url, {
-      headers: { Accept: "application/json" },
-    });
+    if (method === "GET") {
+      await axios.get(url, {
+        headers: DEFAULT_HEADERS,
+      });
+    } else if (method === "POST") {
+      if (!data) {
+        throw new Error("Data is required for POST requests");
+      }
+      await axios.post(url, data, {
+        headers: DEFAULT_HEADERS,
+      });
+    }
 
-    // Success response - no payment required
     return {
       requirements: null,
       solanaOption: null,

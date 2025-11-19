@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 
 import { Command } from "commander";
-import { buildUrlWithQueryParams } from "./src/utils/url";
+import { buildUrlWithQueryParams, parseQueryOption } from "./src/utils/url";
 import { loadKeypair } from "./src/utils/keypair";
 import { makeDryRunRequest, makePaymentRequest } from "./src/utils/requests";
 import { fetchPaymentRequirements, resolveNetwork } from "./src/utils/payment";
@@ -16,7 +16,7 @@ program
 
 program
   .command("GET")
-  .description("Sends a Get Request")
+  .description("Sends a x402 GET Request")
   .argument("<url>", "url to send the request to")
   .option("--keypair <path>", "Path to Solana keypair file")
   .option("--dry-run", "Dry run the request and get the payment payload")
@@ -76,4 +76,30 @@ program
       process.exit(1);
     }
   });
+
+program
+  .command("POST")
+  .description("Sends a x402 POST request")
+  .argument("<url>", "url to send the request to")
+  .option("--keypair <path>", "Path to Solana keypair file")
+  .option("--dry-run", "Dry run the request and get the payment payload")
+  .option("--network <network>", "Network to use", "solana-mainnet-beta")
+  // update the GET request with this function after testing that it works
+  .option("--query <key=value>", "Query parameter", parseQueryOption)
+  .action(async (url, options) => {
+    try {
+      console.log("Options", options);
+      const finalUrl = buildUrlWithQueryParams(url, options.query);
+      if (options.dryRun) {
+        await makeDryRunRequest(finalUrl);
+        return;
+      }
+
+      if (!options.kepair) {
+        console.error("Error: --keypair is required when not using --dry-run");
+        process.exit(1);
+      }
+    } catch (error) {}
+  });
+
 program.parse();

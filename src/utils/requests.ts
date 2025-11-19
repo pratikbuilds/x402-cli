@@ -6,15 +6,24 @@ import { createLocalWallet } from "@faremeter/wallet-solana";
 import { x402PaymentRequiredResponse } from "@faremeter/types/x402";
 import { displayPaymentRequirements } from "./display";
 
-const DEFAULT_HEADERS = {
+export const DEFAULT_HEADERS = {
   Accept: "application/json",
 };
 
-export async function makeDryRunRequest(url: string): Promise<void> {
+export async function makeDryRunRequest(
+  url: string,
+  options?: {
+    method?: "GET" | "POST";
+    data?: unknown;
+  }
+): Promise<void> {
   const startTime = performance.now();
 
   try {
-    const response = await axios.get(url, { headers: DEFAULT_HEADERS });
+    const response =
+      options?.method === "GET"
+        ? await axios.get(url, { headers: DEFAULT_HEADERS })
+        : await axios.post(url, options?.data, { headers: DEFAULT_HEADERS });
     const endTime = performance.now();
     const duration = Math.round(endTime - startTime);
 
@@ -46,7 +55,11 @@ export async function makePaymentRequest(
   url: string,
   keypair: Keypair,
   network: string,
-  asset: string
+  asset: string,
+  options?: {
+    method?: "GET" | "POST";
+    body?: BodyInit | null | undefined;
+  }
 ): Promise<void> {
   const wallet = await createLocalWallet(network, keypair);
   const mint = new PublicKey(asset);
@@ -58,8 +71,9 @@ export async function makePaymentRequest(
 
   try {
     const response = await fetchWithPayer(url, {
-      method: "GET",
+      method: options?.method || "GET",
       headers: DEFAULT_HEADERS,
+      body: options?.body,
     });
 
     const data = await response.json();
