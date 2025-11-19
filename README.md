@@ -189,16 +189,6 @@ You can generate a keypair using Solana CLI:
 solana-keygen new -o my-keypair.json
 ```
 
-## Dependencies
-
-- `@faremeter/fetch`: Fetch wrapper for x402 payments
-- `@faremeter/payment-solana`: Solana payment handler
-- `@faremeter/wallet-solana`: Solana wallet integration
-- `@faremeter/types`: x402 type definitions
-- `@solana/web3.js`: Solana Web3 library
-- `commander`: CLI framework
-- `axios`: HTTP client
-
 ## Development
 
 This project was created using `bun init` and uses Bun as the runtime.
