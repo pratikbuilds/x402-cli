@@ -20,8 +20,9 @@ export async function makeDryRunRequest(
   const startTime = performance.now();
 
   try {
+    const method = options?.method || "GET";
     const response =
-      options?.method === "GET"
+      method === "GET"
         ? await axios.get(url, { headers: DEFAULT_HEADERS })
         : await axios.post(url, options?.data, { headers: DEFAULT_HEADERS });
     const endTime = performance.now();

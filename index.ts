@@ -41,7 +41,9 @@ program
       const finalUrl = buildUrlWithQueryParams(url, options.query);
 
       if (options.dryRun) {
-        await makeDryRunRequest(finalUrl);
+        await makeDryRunRequest(finalUrl, {
+          method: "GET",
+        });
         return;
       }
 
@@ -91,10 +93,11 @@ program
       console.log("Options", options);
       const finalUrl = buildUrlWithQueryParams(url, options.query);
       if (options.dryRun) {
-        await makeDryRunRequest(finalUrl);
+        await makeDryRunRequest(finalUrl, {
+          method: "POST",
+        });
         return;
       }
-
       if (!options.kepair) {
         console.error("Error: --keypair is required when not using --dry-run");
         process.exit(1);
