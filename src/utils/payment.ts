@@ -39,9 +39,6 @@ export async function fetchPaymentRequirements(
         headers,
       });
     } else if (method === "POST") {
-      if (!data) {
-        throw new Error("Data is required for POST requests");
-      }
       await axios.post(url, data, {
         headers,
       });
@@ -59,31 +56,9 @@ export async function fetchPaymentRequirements(
         throw new Error("Invalid payment requirements received");
       }
 
-      console.log("\n[DEBUG] Payment requirements received:");
-      console.log("[DEBUG] Total accepts:", requirements.accepts.length);
-      requirements.accepts.forEach((accept, idx) => {
-        console.log(`[DEBUG] Accept ${idx + 1}:`, {
-          network: accept.network,
-          asset: accept.asset,
-          scheme: accept.scheme,
-          maxAmount: accept.maxAmountRequired,
-        });
-      });
-
       const solanaOption = requirements.accepts.find(
         (accept) =>
           accept.network.startsWith("solana") && accept.scheme === "exact"
-      );
-
-      console.log(
-        "[DEBUG] Selected Solana option:",
-        solanaOption
-          ? {
-              network: solanaOption.network,
-              asset: solanaOption.asset,
-              scheme: solanaOption.scheme,
-            }
-          : "null"
       );
 
       return {

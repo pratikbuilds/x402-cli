@@ -24,17 +24,7 @@ program
   .option(
     "--query <key=value>",
     "Query parameter (can be used multiple times)",
-    (val, prev: Record<string, string> = {}) => {
-      const [key, ...valueParts] = val.split("=");
-      if (!key) {
-        throw new Error(
-          `Invalid query parameter format: ${val}. Use --query key=value`
-        );
-      }
-      const value = valueParts.join("="); // Handle values that contain '='
-      prev[key] = value;
-      return prev;
-    }
+    parseQueryOption
   )
   .action(async (url, options) => {
     try {
@@ -93,7 +83,6 @@ program
   .option("--body <json>", "JSON body for POST request (as JSON string)")
   .action(async (url, options) => {
     try {
-      console.log("Options", options);
       const finalUrl = buildUrlWithQueryParams(url, options.query);
 
       let bodyData: unknown;
