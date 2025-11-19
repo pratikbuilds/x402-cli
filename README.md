@@ -1,6 +1,6 @@
 # x402-cli
 
-A command-line interface for interacting with x402 APIs on Solana. This CLI tool enables you to make GET requests to x402-protected endpoints, automatically handling payment requirements using Solana payments.
+A command-line interface for interacting with x402 APIs on Solana. This CLI tool enables you to make GET and POST requests to x402-protected endpoints, automatically handling payment requirements using Solana payments.
 
 ## Features
 
@@ -9,6 +9,7 @@ A command-line interface for interacting with x402 APIs on Solana. This CLI tool
 - 🌐 **Network support**: Works with Solana mainnet and devnet
 - 🔑 **Keypair management**: Use local Solana keypairs for authentication
 - 📊 **Query parameters**: Easily add query parameters to requests
+- 📤 **POST support**: Make POST requests with optional JSON body
 - ⚡ **Built with Bun**: Fast execution using Bun runtime
 
 ## Installation
@@ -36,12 +37,25 @@ chmod +x index.ts
 bun run index.ts GET <url>
 ```
 
+### Basic POST Request
+
+```bash
+bun run index.ts POST <url>
+```
+
+POST requests can optionally include a JSON body:
+
+```bash
+bun run index.ts POST <url> --body '{"key": "value"}'
+```
+
 ### Dry Run (Preview Payment Requirements)
 
 Preview payment requirements without making a payment:
 
 ```bash
 bun run index.ts GET <url> --dry-run
+bun run index.ts POST <url> --dry-run
 ```
 
 ### Making Payments
@@ -50,6 +64,7 @@ To make a request that requires payment, provide a Solana keypair:
 
 ```bash
 bun run index.ts GET <url> --keypair <path-to-keypair.json>
+bun run index.ts POST <url> --keypair <path-to-keypair.json>
 ```
 
 ### Query Parameters
@@ -79,6 +94,15 @@ bun run index.ts GET <url> --keypair <path> --network devnet
 - `--dry-run`: Preview payment requirements without making payment
 - `--network <network>`: Solana network to use (`mainnet-beta` or `devnet`)
 - `--query <key=value>`: Query parameter (can be used multiple times)
+
+### POST Command
+
+- `<url>` (required): The URL to send the POST request to
+- `--keypair <path>`: Path to Solana keypair file (required for payment mode)
+- `--dry-run`: Preview payment requirements without making payment
+- `--network <network>`: Solana network to use (`mainnet-beta` or `devnet`)
+- `--query <key=value>`: Query parameter (can be used multiple times)
+- `--body <json>`: JSON body for POST request (as JSON string, optional)
 
 ## Examples
 
@@ -114,9 +138,25 @@ bun run index.ts GET https://jupiter.api.corbits.dev/tokens/v2/recent \
   --keypair ~/.config/solana/auth.json
 ```
 
+### Example 5: POST Request with Body
+
+```bash
+bun run index.ts POST https://api.example.com/data \
+  --body '{"name": "test", "value": 123}' \
+  --keypair ~/.config/solana/id.json
+```
+
+### Example 6: POST Request without Body (Dry Run)
+
+```bash
+bun run index.ts POST https://api.example.com/data --dry-run
+```
+
+POST requests work with or without a body, making them flexible for different API requirements.
+
 ## How It Works
 
-1. **Dry Run Mode**: When `--dry-run` is used, the CLI makes a request and displays payment requirements if a 402 response is received. No payment is made.
+1. **Dry Run Mode**: When `--dry-run` is used, the CLI makes a request (GET or POST) and displays payment requirements if a 402 response is received. No payment is made.
 
 2. **Payment Mode**: When a keypair is provided:
 
@@ -126,9 +166,14 @@ bun run index.ts GET https://jupiter.api.corbits.dev/tokens/v2/recent \
    - Retries the original request with payment proof
 
 3. **Network Resolution**: The CLI automatically resolves network names:
+
    - `solana-mainnet-beta` → `mainnet-beta`
    - `solana-devnet` → `devnet`
-   - You can override with `--network`
+   - `solana` → `mainnet-beta`
+   - You can override with `--network` option
+   - User-provided networks are also automatically mapped if they match known patterns
+
+4. **POST Requests**: POST requests support optional JSON bodies. If no `--body` is provided, the request is sent without a body. This works consistently in both dry-run and payment modes.
 
 ## Keypair Format
 
@@ -173,4 +218,4 @@ To contribute:
 
 ## License
 
-[Add your license here]
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
