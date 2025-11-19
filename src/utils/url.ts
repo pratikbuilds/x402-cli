@@ -14,3 +14,18 @@ export function buildUrlWithQueryParams(
   const separator = baseUrl.includes("?") ? "&" : "?";
   return `${baseUrl}${separator}${urlSearchParams.toString()}`;
 }
+
+export function parseQueryOption(
+  val: string,
+  prev: Record<string, string> = {}
+): Record<string, string> {
+  const [key, ...valueParts] = val.split("=");
+  if (!key) {
+    throw new Error(
+      `Invalid query parameter format: ${val}. Use --query key=value`
+    );
+  }
+  const value = valueParts.join("="); // Handle values that contain '='
+  prev[key] = value;
+  return prev;
+}

@@ -107,6 +107,13 @@ bun run index.ts GET https://api.example.com/search \
   --keypair ~/.config/solana/id.json
 ```
 
+### Example 4: Real-world API Request
+
+```bash
+bun run index.ts GET https://jupiter.api.corbits.dev/tokens/v2/recent \
+  --keypair ~/.config/solana/auth.json
+```
+
 ## How It Works
 
 1. **Dry Run Mode**: When `--dry-run` is used, the CLI makes a request and displays payment requirements if a 402 response is received. No payment is made.
@@ -150,6 +157,19 @@ solana-keygen new -o my-keypair.json
 ## Development
 
 This project was created using `bun init` and uses Bun as the runtime.
+
+## Contributing
+
+Contributions are welcome! This project is open to contributions from the community. Whether it's bug fixes, new features, documentation improvements, or other enhancements, we appreciate your help in making this CLI tool better.
+
+To contribute:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feat/your-feature`)
+3. Make your changes
+4. Commit your changes (`git commit -m 'Add some feature'`)
+5. Push to the branch (`git push origin feat/your-feature`)
+6. Open a Pull Request
 
 ## License
 

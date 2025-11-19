@@ -1,5 +1,6 @@
 import { x402PaymentRequiredResponse } from "@faremeter/types/x402";
 import axios, { AxiosError } from "axios";
+import { DEFAULT_HEADERS } from "./requests";
 
 const NETWORK_MAP: Record<string, string> = {
   "solana-mainnet-beta": "mainnet-beta",
@@ -21,14 +22,28 @@ export interface PaymentRequirementsResult {
 }
 
 export async function fetchPaymentRequirements(
-  url: string
+  url: string,
+  method: "GET" | "POST" = "GET",
+  data?: any
 ): Promise<PaymentRequirementsResult> {
   try {
-    const response = await axios.get(url, {
-      headers: { Accept: "application/json" },
-    });
+    const headers = {
+      ...DEFAULT_HEADERS,
+      ...(method === "POST" && data
+        ? { "Content-Type": "application/json" }
+        : {}),
+    };
 
-    // Success response - no payment required
+    if (method === "GET") {
+      await axios.get(url, {
+        headers,
+      });
+    } else if (method === "POST") {
+      await axios.post(url, data, {
+        headers,
+      });
+    }
+
     return {
       requirements: null,
       solanaOption: null,
@@ -64,7 +79,14 @@ export function resolveNetwork(
   paymentNetwork: string,
   userNetwork?: string
 ): string {
-  if (userNetwork) return userNetwork;
+  if (userNetwork) {
+    // Map user-provided network too
+    return (
+      NETWORK_MAP[userNetwork] ||
+      userNetwork.replace("solana-", "") ||
+      userNetwork
+    );
+  }
 
   return (
     NETWORK_MAP[paymentNetwork] ||
