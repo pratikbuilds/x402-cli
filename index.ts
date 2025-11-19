@@ -57,7 +57,8 @@ program
       console.log("Wallet:", keypair.publicKey.toString());
 
       const { requirements, solanaOption } = await fetchPaymentRequirements(
-        finalUrl
+        finalUrl,
+        "GET"
       );
 
       // If no payment required (200 response), requirements will be null
@@ -69,7 +70,9 @@ program
       console.log("Network:", network);
       console.log("Asset:", solanaOption.asset);
 
-      await makePaymentRequest(finalUrl, keypair, network, solanaOption.asset);
+      await makePaymentRequest(finalUrl, keypair, network, solanaOption.asset, {
+        method: "GET",
+      });
     } catch (error) {
       console.error(
         "Error:",
@@ -102,7 +105,34 @@ program
         console.error("Error: --keypair is required when not using --dry-run");
         process.exit(1);
       }
-    } catch (error) {}
+
+      const keypair = loadKeypair(options.keypair);
+      console.log("Wallet:", keypair.publicKey.toString());
+
+      const { requirements, solanaOption } = await fetchPaymentRequirements(
+        finalUrl,
+        "POST"
+      );
+
+      if (!requirements || !solanaOption) {
+        return;
+      }
+
+      const network = resolveNetwork(solanaOption.network, options.network);
+      console.log("Network:", network);
+      console.log("Asset:", solanaOption.asset);
+
+      await makePaymentRequest(finalUrl, keypair, network, solanaOption.asset, {
+        method: "POST",
+        body: options.body ? JSON.stringify(options.body) : undefined,
+      });
+    } catch (error) {
+      console.error(
+        "Error:",
+        error instanceof Error ? error.message : String(error)
+      );
+      process.exit(1);
+    }
   });
 
 program.parse();
