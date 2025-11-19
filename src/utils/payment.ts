@@ -27,16 +27,23 @@ export async function fetchPaymentRequirements(
   data?: any
 ): Promise<PaymentRequirementsResult> {
   try {
+    const headers = {
+      ...DEFAULT_HEADERS,
+      ...(method === "POST" && data
+        ? { "Content-Type": "application/json" }
+        : {}),
+    };
+
     if (method === "GET") {
       await axios.get(url, {
-        headers: DEFAULT_HEADERS,
+        headers,
       });
     } else if (method === "POST") {
       if (!data) {
         throw new Error("Data is required for POST requests");
       }
       await axios.post(url, data, {
-        headers: DEFAULT_HEADERS,
+        headers,
       });
     }
 
@@ -52,9 +59,31 @@ export async function fetchPaymentRequirements(
         throw new Error("Invalid payment requirements received");
       }
 
+      console.log("\n[DEBUG] Payment requirements received:");
+      console.log("[DEBUG] Total accepts:", requirements.accepts.length);
+      requirements.accepts.forEach((accept, idx) => {
+        console.log(`[DEBUG] Accept ${idx + 1}:`, {
+          network: accept.network,
+          asset: accept.asset,
+          scheme: accept.scheme,
+          maxAmount: accept.maxAmountRequired,
+        });
+      });
+
       const solanaOption = requirements.accepts.find(
         (accept) =>
           accept.network.startsWith("solana") && accept.scheme === "exact"
+      );
+
+      console.log(
+        "[DEBUG] Selected Solana option:",
+        solanaOption
+          ? {
+              network: solanaOption.network,
+              asset: solanaOption.asset,
+              scheme: solanaOption.scheme,
+            }
+          : "null"
       );
 
       return {
@@ -75,7 +104,14 @@ export function resolveNetwork(
   paymentNetwork: string,
   userNetwork?: string
 ): string {
-  if (userNetwork) return userNetwork;
+  if (userNetwork) {
+    // Map user-provided network too
+    return (
+      NETWORK_MAP[userNetwork] ||
+      userNetwork.replace("solana-", "") ||
+      userNetwork
+    );
+  }
 
   return (
     NETWORK_MAP[paymentNetwork] ||

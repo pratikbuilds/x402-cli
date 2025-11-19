@@ -88,20 +88,33 @@ program
   .argument("<url>", "url to send the request to")
   .option("--keypair <path>", "Path to Solana keypair file")
   .option("--dry-run", "Dry run the request and get the payment payload")
-  .option("--network <network>", "Network to use", "solana-mainnet-beta")
-  // update the GET request with this function after testing that it works
+  .option("--network <network>", "Network to use")
   .option("--query <key=value>", "Query parameter", parseQueryOption)
+  .option("--body <json>", "JSON body for POST request (as JSON string)")
   .action(async (url, options) => {
     try {
       console.log("Options", options);
       const finalUrl = buildUrlWithQueryParams(url, options.query);
+
+      let bodyData: unknown;
+      if (options.body) {
+        try {
+          bodyData = JSON.parse(options.body);
+        } catch (e) {
+          console.error("Error: --body must be valid JSON");
+          process.exit(1);
+        }
+      }
+
       if (options.dryRun) {
         await makeDryRunRequest(finalUrl, {
           method: "POST",
+          data: bodyData,
         });
         return;
       }
-      if (!options.kepair) {
+
+      if (!options.keypair) {
         console.error("Error: --keypair is required when not using --dry-run");
         process.exit(1);
       }
@@ -111,7 +124,8 @@ program
 
       const { requirements, solanaOption } = await fetchPaymentRequirements(
         finalUrl,
-        "POST"
+        "POST",
+        bodyData
       );
 
       if (!requirements || !solanaOption) {
@@ -124,7 +138,7 @@ program
 
       await makePaymentRequest(finalUrl, keypair, network, solanaOption.asset, {
         method: "POST",
-        body: options.body ? JSON.stringify(options.body) : undefined,
+        body: bodyData ? JSON.stringify(bodyData) : undefined,
       });
     } catch (error) {
       console.error(
