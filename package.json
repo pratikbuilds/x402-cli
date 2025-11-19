@@ -2,6 +2,9 @@
   "name": "x402-cli",
   "module": "index.ts",
   "type": "module",
+  "bin": {
+    "x402-cli": "./index.ts"
+  },
   "devDependencies": {
     "@types/bun": "latest"
   },

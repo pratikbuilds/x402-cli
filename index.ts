@@ -1,3 +1,5 @@
+#!/usr/bin/env bun
+
 import { Command } from "commander";
 import { buildUrlWithQueryParams } from "./src/utils/url";
 import { loadKeypair } from "./src/utils/keypair";
