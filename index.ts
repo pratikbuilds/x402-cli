@@ -12,7 +12,7 @@ import {
 const program = new Command();
 
 program
-  .name("x402-cli")
+  .name("x402tool")
   .description("A CLI to call x402 apis on Solana")
   .version("0.1.0");
 

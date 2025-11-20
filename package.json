@@ -1,5 +1,5 @@
 {
-  "name": "x402-cli",
+  "name": "x402tool",
   "version": "0.1.0",
   "description": "A command-line interface for interacting with x402 APIs on Solana",
   "keywords": [
@@ -19,7 +19,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "x402-cli": "./dist/index.js"
+    "x402tool": "./dist/index.js"
   },
   "files": [
     "dist",
