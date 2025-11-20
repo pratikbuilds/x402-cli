@@ -4,7 +4,7 @@ import { createPaymentHandler } from "@faremeter/payment-solana/exact";
 import { PublicKey, Keypair, Connection } from "@solana/web3.js";
 import { createLocalWallet } from "@faremeter/wallet-solana";
 import { x402PaymentRequiredResponse } from "@faremeter/types/x402";
-import { displayPaymentRequirements } from "./display";
+import { displayPaymentRequirements } from "./display.js";
 
 export const DEFAULT_HEADERS = {
   Accept: "application/json",

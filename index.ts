@@ -1,11 +1,13 @@
-#!/usr/bin/env bun
+#!/usr/bin/env node
 
 import { Command } from "commander";
-import { buildUrlWithQueryParams, parseQueryOption } from "./src/utils/url";
-import { loadKeypair } from "./src/utils/keypair";
-import { makeDryRunRequest, makePaymentRequest } from "./src/utils/requests";
-import { fetchPaymentRequirements, resolveNetwork } from "./src/utils/payment";
-import { displayPaymentRequirements } from "./src/utils/display";
+import { buildUrlWithQueryParams, parseQueryOption } from "./src/utils/url.js";
+import { loadKeypair } from "./src/utils/keypair.js";
+import { makeDryRunRequest, makePaymentRequest } from "./src/utils/requests.js";
+import {
+  fetchPaymentRequirements,
+  resolveNetwork,
+} from "./src/utils/payment.js";
 
 const program = new Command();
 

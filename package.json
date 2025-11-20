@@ -1,14 +1,42 @@
 {
   "name": "x402-cli",
-  "module": "index.ts",
+  "version": "0.1.0",
+  "description": "A command-line interface for interacting with x402 APIs on Solana",
+  "keywords": [
+    "x402",
+    "solana",
+    "cli",
+    "payment",
+    "api"
+  ],
+  "author": "Pratik",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pratikbuilds/x402-cli"
+  },
   "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "bin": {
-    "x402-cli": "./index.ts"
+    "x402-cli": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build",
+    "prepack": "npm run build"
   },
   "devDependencies": {
-    "@types/bun": "latest"
-  },
-  "peerDependencies": {
+    "@types/bun": "latest",
+    "@types/node": "^20.0.0",
     "typescript": "^5.0.0"
   },
   "dependencies": {

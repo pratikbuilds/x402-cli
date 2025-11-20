@@ -1,6 +1,6 @@
 import { x402PaymentRequiredResponse } from "@faremeter/types/x402";
 import axios, { AxiosError } from "axios";
-import { DEFAULT_HEADERS } from "./requests";
+import { DEFAULT_HEADERS } from "./requests.js";
 
 const NETWORK_MAP: Record<string, string> = {
   "solana-mainnet-beta": "mainnet-beta",
@@ -57,7 +57,7 @@ export async function fetchPaymentRequirements(
       }
 
       const solanaOption = requirements.accepts.find(
-        (accept) =>
+        (accept: (typeof requirements.accepts)[0]) =>
           accept.network.startsWith("solana") && accept.scheme === "exact"
       );
 

@@ -56,7 +56,7 @@ export function displayPaymentRequirements(
   );
   console.log("");
 
-  payResp.accepts.forEach((accept, index: number) => {
+  payResp.accepts.forEach((accept: typeof payResp.accepts[0], index: number) => {
     console.log(
       colorize(`Payment Option ${index + 1}`, "yellow") +
         colorize(` (${accept.network})`, "dim")

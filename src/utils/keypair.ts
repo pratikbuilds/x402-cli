@@ -1,5 +1,5 @@
 import { Keypair } from "@solana/web3.js";
-import fs from "fs";
+import * as fs from "fs";
 
 export function loadKeypair(keypairPath: string): Keypair {
   if (!keypairPath) {
