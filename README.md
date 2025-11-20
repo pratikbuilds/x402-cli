@@ -8,13 +8,11 @@ A command-line interface for interacting with x402 APIs on Solana. This CLI tool
 
 ## Features
 
-- 🔍 **Dry-run mode**: Preview payment requirements without making payments
-- 💰 **Automatic payments**: Handle 402 Payment Required responses with Solana payments
-- 🌐 **Network support**: Works with Solana mainnet and devnet
-- 🔑 **Keypair management**: Use local Solana keypairs for authentication
-- 📊 **Query parameters**: Easily add query parameters to requests
-- 📤 **POST support**: Make POST requests with optional JSON body
-- ⚡ **Fast & reliable**: Built with TypeScript and Node.js
+- **Automatic payment handling**: Intercepts 402 Payment Required responses and executes Solana transactions transparently
+- **Dry-run mode**: Inspect payment requirements without executing transactions
+- **HTTP method support**: GET and POST requests with optional JSON payloads
+- **Solana integration**: Mainnet and devnet support with automatic network resolution
+- **Query parameter support**: Multiple query parameters via repeated flags
 
 ## Installation
 
@@ -118,53 +116,49 @@ x402tool GET <url> --keypair <path> --network devnet
 
 ## Examples
 
-### Example 1: Dry Run
+The following examples demonstrate usage with [Corbits](https://docs.corbits.dev) x402-protected APIs, including Jupiter and Triton RPC endpoints.
+
+### Example 1: Jupiter GET Request (Dry Run)
+
+Preview payment requirements for a Jupiter API request with query parameters:
 
 ```bash
-x402tool GET https://api.example.com/data --dry-run
+x402tool GET "https://jupiter.api.corbits.dev/ultra/v1/order" \
+  --dry-run \
+  --query inputMint=So11111111111111111111111111111111111111112 \
+  --query outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v \
+  --query amount=20000000 \
+  --query taker=YOUR_WALLET_ADDRESS
 ```
 
-This will show you the payment requirements without making a payment.
+### Example 2: Jupiter GET Request (With Payment)
 
-### Example 2: Make a Payment Request
-
-```bash
-x402tool GET https://api.example.com/data \
-  --keypair ~/.config/solana/id.json \
-  --network mainnet-beta
-```
-
-### Example 3: Request with Query Parameters
-
-```bash
-x402tool GET https://api.example.com/search \
-  --query "q=solana" \
-  --query "limit=10" \
-  --keypair ~/.config/solana/id.json
-```
-
-### Example 4: Real-world API Request
+Make a paid request to Jupiter API:
 
 ```bash
 x402tool GET https://jupiter.api.corbits.dev/tokens/v2/recent \
   --keypair ~/.config/solana/auth.json
 ```
 
-### Example 5: POST Request with Body
+### Example 3: Triton RPC POST Request (Dry Run)
+
+Preview payment requirements for a Triton RPC call. See [Triton RPC documentation](https://docs.corbits.dev/api/partners/triton/overview) for details:
 
 ```bash
-x402tool POST https://api.example.com/data \
-  --body '{"name": "test", "value": 123}' \
-  --keypair ~/.config/solana/id.json
+x402tool POST https://triton.api.corbits.dev \
+  --dry-run \
+  --body '{"jsonrpc":"2.0","id":1,"method":"getBalance","params":["corzHctjX9Wtcrkfxz3Se8zdXqJYCaamWcQA7vwKF7Q"]}'
 ```
 
-### Example 6: POST Request without Body (Dry Run)
+### Example 4: Triton RPC POST Request (With Payment)
+
+Execute a Solana RPC method via Triton with automatic payment:
 
 ```bash
-x402tool POST https://api.example.com/data --dry-run
+x402tool POST https://triton.api.corbits.dev \
+  --keypair ~/.config/solana/auth.json \
+  --body '{"jsonrpc":"2.0","id":1,"method":"getBalance","params":["corzHctjX9Wtcrkfxz3Se8zdXqJYCaamWcQA7vwKF7Q"]}'
 ```
-
-POST requests work with or without a body, making them flexible for different API requirements.
 
 ## How It Works
 
