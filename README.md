@@ -1,4 +1,8 @@
-# x402-cli
+# x402tool
+
+[![npm version](https://img.shields.io/npm/v/x402tool.svg)](https://www.npmjs.com/package/x402tool)
+[![npm downloads](https://img.shields.io/npm/dm/x402tool.svg)](https://www.npmjs.com/package/x402tool)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A command-line interface for interacting with x402 APIs on Solana. This CLI tool enables you to make GET and POST requests to x402-protected endpoints, automatically handling payment requirements using Solana payments.
 
@@ -10,23 +14,31 @@ A command-line interface for interacting with x402 APIs on Solana. This CLI tool
 - 🔑 **Keypair management**: Use local Solana keypairs for authentication
 - 📊 **Query parameters**: Easily add query parameters to requests
 - 📤 **POST support**: Make POST requests with optional JSON body
-- ⚡ **Built with Bun**: Fast execution using Bun runtime
+- ⚡ **Fast & reliable**: Built with TypeScript and Node.js
 
 ## Installation
 
 ### Prerequisites
 
-- [Bun](https://bun.sh) v1.1.29 or later
-- TypeScript ^5.0.0
+- Node.js v18.0.0 or later
+- npm or yarn
 
-### Setup
+### Install from npm
 
 ```bash
-# Install dependencies
-bun install
+npm install -g x402tool
+```
 
-# Make the CLI executable (optional, for global usage)
-chmod +x index.ts
+Or using yarn:
+
+```bash
+yarn global add x402tool
+```
+
+### Verify Installation
+
+```bash
+x402tool --version
 ```
 
 ## Usage
@@ -34,19 +46,19 @@ chmod +x index.ts
 ### Basic GET Request
 
 ```bash
-bun run index.ts GET <url>
+x402tool GET <url>
 ```
 
 ### Basic POST Request
 
 ```bash
-bun run index.ts POST <url>
+x402tool POST <url>
 ```
 
 POST requests can optionally include a JSON body:
 
 ```bash
-bun run index.ts POST <url> --body '{"key": "value"}'
+x402tool POST <url> --body '{"key": "value"}'
 ```
 
 ### Dry Run (Preview Payment Requirements)
@@ -54,8 +66,8 @@ bun run index.ts POST <url> --body '{"key": "value"}'
 Preview payment requirements without making a payment:
 
 ```bash
-bun run index.ts GET <url> --dry-run
-bun run index.ts POST <url> --dry-run
+x402tool GET <url> --dry-run
+x402tool POST <url> --dry-run
 ```
 
 ### Making Payments
@@ -63,8 +75,8 @@ bun run index.ts POST <url> --dry-run
 To make a request that requires payment, provide a Solana keypair:
 
 ```bash
-bun run index.ts GET <url> --keypair <path-to-keypair.json>
-bun run index.ts POST <url> --keypair <path-to-keypair.json>
+x402tool GET <url> --keypair <path-to-keypair.json>
+x402tool POST <url> --keypair <path-to-keypair.json>
 ```
 
 ### Query Parameters
@@ -72,7 +84,7 @@ bun run index.ts POST <url> --keypair <path-to-keypair.json>
 Add query parameters using the `--query` option (can be used multiple times):
 
 ```bash
-bun run index.ts GET <url> --query "key1=value1" --query "key2=value2"
+x402tool GET <url> --query "key1=value1" --query "key2=value2"
 ```
 
 ### Network Selection
@@ -80,9 +92,9 @@ bun run index.ts GET <url> --query "key1=value1" --query "key2=value2"
 Specify the Solana network to use:
 
 ```bash
-bun run index.ts GET <url> --keypair <path> --network mainnet-beta
+x402tool GET <url> --keypair <path> --network mainnet-beta
 # or
-bun run index.ts GET <url> --keypair <path> --network devnet
+x402tool GET <url> --keypair <path> --network devnet
 ```
 
 ## Command Options
@@ -109,7 +121,7 @@ bun run index.ts GET <url> --keypair <path> --network devnet
 ### Example 1: Dry Run
 
 ```bash
-bun run index.ts GET https://api.example.com/data --dry-run
+x402tool GET https://api.example.com/data --dry-run
 ```
 
 This will show you the payment requirements without making a payment.
@@ -117,7 +129,7 @@ This will show you the payment requirements without making a payment.
 ### Example 2: Make a Payment Request
 
 ```bash
-bun run index.ts GET https://api.example.com/data \
+x402tool GET https://api.example.com/data \
   --keypair ~/.config/solana/id.json \
   --network mainnet-beta
 ```
@@ -125,7 +137,7 @@ bun run index.ts GET https://api.example.com/data \
 ### Example 3: Request with Query Parameters
 
 ```bash
-bun run index.ts GET https://api.example.com/search \
+x402tool GET https://api.example.com/search \
   --query "q=solana" \
   --query "limit=10" \
   --keypair ~/.config/solana/id.json
@@ -134,14 +146,14 @@ bun run index.ts GET https://api.example.com/search \
 ### Example 4: Real-world API Request
 
 ```bash
-bun run index.ts GET https://jupiter.api.corbits.dev/tokens/v2/recent \
+x402tool GET https://jupiter.api.corbits.dev/tokens/v2/recent \
   --keypair ~/.config/solana/auth.json
 ```
 
 ### Example 5: POST Request with Body
 
 ```bash
-bun run index.ts POST https://api.example.com/data \
+x402tool POST https://api.example.com/data \
   --body '{"name": "test", "value": 123}' \
   --keypair ~/.config/solana/id.json
 ```
@@ -149,7 +161,7 @@ bun run index.ts POST https://api.example.com/data \
 ### Example 6: POST Request without Body (Dry Run)
 
 ```bash
-bun run index.ts POST https://api.example.com/data --dry-run
+x402tool POST https://api.example.com/data --dry-run
 ```
 
 POST requests work with or without a body, making them flexible for different API requirements.
@@ -191,7 +203,40 @@ solana-keygen new -o my-keypair.json
 
 ## Development
 
-This project was created using `bun init` and uses Bun as the runtime.
+### Prerequisites
+
+- Node.js v18.0.0 or later
+- npm or yarn
+- TypeScript ^5.0.0
+
+### Setup
+
+```bash
+# Clone the repository
+git clone https://github.com/pratikbuilds/x402-cli.git
+cd x402-cli
+
+# Install dependencies
+npm install
+
+# Build the project
+npm run build
+```
+
+### Running Locally
+
+After building, you can run the CLI locally:
+
+```bash
+node dist/index.js GET <url>
+```
+
+Or use npm link for development:
+
+```bash
+npm link
+x402tool GET <url>
+```
 
 ## Contributing
 
